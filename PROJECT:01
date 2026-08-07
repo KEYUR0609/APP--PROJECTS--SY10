@@ -1,0 +1,260 @@
+class Book:
+    def __init__(self, book_id, title, author):
+        self.book_id = book_id
+        self.title = title
+        self.author = author
+        self.is_available = True
+
+    def borrow(self):
+        if self.is_available:
+            self.is_available = False
+            return True
+        return False
+
+    def return_book(self):
+        self.is_available = True
+
+
+class Patron:
+    def __init__(self, patron_id, name):
+        self.patron_id = patron_id
+        self.name = name
+        self.borrowed_books = []
+
+    def borrow_book(self, book):
+        if book.borrow():
+            self.borrowed_books.append(book)
+            return True
+        return False
+
+    def return_book(self, book):
+        if book in self.borrowed_books:
+            book.return_book()
+            self.borrowed_books.remove(book)
+            return True
+        return False
+
+
+class Library:
+    def __init__(self):
+        self.books = {}
+        self.patrons = {}
+
+    # 1. Add a book
+    def add_book(self, book):
+        if book.book_id in self.books:
+            print("A book with this ID already exists.")
+        else:
+            self.books[book.book_id] = book
+            print(f"Book '{book.title}' added successfully.")
+
+    # 2. Register a patron
+    def register_patron(self, patron):
+        if patron.patron_id in self.patrons:
+            print("A patron with this ID already exists.")
+        else:
+            self.patrons[patron.patron_id] = patron
+            print(f"Patron '{patron.name}' registered successfully.")
+
+    # 3. Borrow a book
+    def borrow_book(self, patron_id, book_id):
+        if patron_id not in self.patrons:
+            print("Patron not found.")
+            return
+
+        if book_id not in self.books:
+            print("Book not found.")
+            return
+
+        patron = self.patrons[patron_id]
+        book = self.books[book_id]
+
+        if patron.borrow_book(book):
+            print(f"'{book.title}' borrowed by {patron.name}.")
+        else:
+            print(f"'{book.title}' is currently unavailable.")
+
+    # 4. Return a book
+    def return_book(self, patron_id, book_id):
+        if patron_id not in self.patrons:
+            print("Patron not found.")
+            return
+
+        if book_id not in self.books:
+            print("Book not found.")
+            return
+
+        patron = self.patrons[patron_id]
+        book = self.books[book_id]
+
+        if patron.return_book(book):
+            print(f"'{book.title}' returned by {patron.name}.")
+        else:
+            print(f"{patron.name} did not borrow '{book.title}'.")
+
+    # 5. Display available books
+    def display_books(self):
+        print("\n--- Available Books ---")
+
+        available_books = [
+            book for book in self.books.values()
+            if book.is_available
+        ]
+
+        if not available_books:
+            print("No books are currently available.")
+            return
+
+        for book in available_books:
+            print(
+                f"ID: {book.book_id} | "
+                f"Title: {book.title} | "
+                f"Author: {book.author}"
+            )
+
+    # 6. Display registered patrons
+    def display_patrons(self):
+        print("\n--- Registered Patrons ---")
+
+        if not self.patrons:
+            print("No patrons registered.")
+            return
+
+        for patron in self.patrons.values():
+            borrowed = [book.title for book in patron.borrowed_books]
+
+            if borrowed:
+                borrowed_text = ", ".join(borrowed)
+            else:
+                borrowed_text = "None"
+
+            print(
+                f"ID: {patron.patron_id} | "
+                f"Name: {patron.name} | "
+                f"Borrowed Books: {borrowed_text}"
+            )
+
+    # 7. Search for books
+    def search_books(self, keyword):
+        print(f"\n--- Search Results for '{keyword}' ---")
+
+        found_books = []
+
+        for book in self.books.values():
+            if (keyword.lower() in book.title.lower() or
+                    keyword.lower() in book.author.lower()):
+                found_books.append(book)
+
+        if not found_books:
+            print("No books found.")
+            return
+
+        for book in found_books:
+            status = "Available" if book.is_available else "Borrowed"
+
+            print(
+                f"ID: {book.book_id} | "
+                f"Title: {book.title} | "
+                f"Author: {book.author} | "
+                f"Status: {status}"
+            )
+
+    # 8. Remove a book
+    def remove_book(self, book_id):
+        if book_id not in self.books:
+            print("Book not found.")
+            return
+
+        book = self.books[book_id]
+
+        # Prevent removing a borrowed book
+        if not book.is_available:
+            print("Cannot remove this book because it is currently borrowed.")
+            return
+
+        del self.books[book_id]
+
+        print(f"Book '{book.title}' removed successfully.")
+
+
+# ==========================================
+# Main Program
+# ==========================================
+
+library = Library()
+
+while True:
+    print("\n================================")
+    print("   LIBRARY MANAGEMENT SYSTEM")
+    print("================================")
+    print("1. Add Book")
+    print("2. Register Patron")
+    print("3. Borrow Book")
+    print("4. Return Book")
+    print("5. Display Available Books")
+    print("6. Display Registered Patrons")
+    print("7. Search for Books")
+    print("8. Remove Book")
+    print("9. Exit")
+    print("================================")
+
+    choice = input("Enter your choice: ")
+
+    # Add Book
+    if choice == "1":
+        book_id = input("Enter book ID: ")
+        title = input("Enter book title: ")
+        author = input("Enter author name: ")
+
+        book = Book(book_id, title, author)
+        library.add_book(book)
+
+    # Register Patron
+    elif choice == "2":
+        patron_id = input("Enter patron ID: ")
+        name = input("Enter patron name: ")
+
+        patron = Patron(patron_id, name)
+        library.register_patron(patron)
+
+    # Borrow Book
+    elif choice == "3":
+        patron_id = input("Enter patron ID: ")
+        book_id = input("Enter book ID: ")
+
+        library.borrow_book(patron_id, book_id)
+
+    # Return Book
+    elif choice == "4":
+        patron_id = input("Enter patron ID: ")
+        book_id = input("Enter book ID: ")
+
+        library.return_book(patron_id, book_id)
+
+    # Display Available Books
+    elif choice == "5":
+        library.display_books()
+
+    # Display Registered Patrons
+    elif choice == "6":
+        library.display_patrons()
+
+    # Search Books
+    elif choice == "7":
+        keyword = input("Enter book title or author to search: ")
+
+        library.search_books(keyword)
+
+    # Remove Book
+    elif choice == "8":
+        book_id = input("Enter book ID to remove: ")
+
+        library.remove_book(book_id)
+
+    # Exit
+    elif choice == "9":
+        print("Thank you for using the Library Management System!")
+        break
+
+    else:
+        print("Invalid choice. Please enter a number from 1 to 9.")
