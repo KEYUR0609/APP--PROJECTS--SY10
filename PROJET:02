@@ -1,0 +1,119 @@
+class Report:
+    templates = {}
+
+    def __init__(self, title, data):
+        self.title = title
+        self.data = data
+
+    # Decorator for formatting
+    @staticmethod
+    def format_report(func):
+        def wrapper(self, *args, **kwargs):
+            report = func(self, *args, **kwargs)
+            return f"\n{'=' * 50}\n{report}\n{'=' * 50}"
+        return wrapper
+
+    # Class method for creating templates
+    @classmethod
+    def add_template(cls, name, template):
+        cls.templates[name] = template
+        print(f"Template '{name}' added successfully.")
+
+    # Generate report
+    @format_report
+    def generate(self, template_name):
+        if template_name not in self.templates:
+            return "Template not found."
+
+        template = self.templates[template_name]
+
+        try:
+            return template.format(
+                title=self.title,
+                **self.data
+            )
+        except KeyError as e:
+            return f"Missing data: {e}"
+
+    # Magic method
+    def __str__(self):
+        return f"Report: {self.title}"
+
+    # Magic method
+    def __len__(self):
+        return len(self.data)
+
+
+# -----------------------------------
+# Main Program
+# -----------------------------------
+
+# Create templates
+Report.add_template(
+    "simple",
+    "Report Title: {title}\nName: {name}\nAge: {age}"
+)
+
+Report.add_template(
+    "detailed",
+    "===== {title} =====\n"
+    "Name: {name}\n"
+    "Age: {age}\n"
+    "Department: {department}\n"
+    "Score: {score}"
+)
+
+
+while True:
+    print("\n===== DYNAMIC REPORT GENERATOR =====")
+    print("1. Create Report")
+    print("2. Add Template")
+    print("3. Display Templates")
+    print("4. Exit")
+
+    choice = input("Enter your choice: ")
+
+    if choice == "1":
+        title = input("Enter report title: ")
+        name = input("Enter name: ")
+        age = input("Enter age: ")
+        department = input("Enter department: ")
+        score = input("Enter score: ")
+
+        data = {
+            "name": name,
+            "age": age,
+            "department": department,
+            "score": score
+        }
+
+        report = Report(title, data)
+
+        print("\nAvailable Templates:")
+        for template in Report.templates:
+            print("-", template)
+
+        template_name = input("Enter template name: ")
+
+        print(report.generate(template_name))
+
+        print(f"\n{report}")
+        print(f"Number of data fields: {len(report)}")
+
+    elif choice == "2":
+        name = input("Enter template name: ")
+        template = input("Enter template:\n")
+
+        Report.add_template(name, template)
+
+    elif choice == "3":
+        print("\nAvailable Templates:")
+        for name in Report.templates:
+            print("-", name)
+
+    elif choice == "4":
+        print("Thank you for using the Report Generator!")
+        break
+
+    else:
+        print("Invalid choice.")
