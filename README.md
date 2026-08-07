@@ -1,1 +1,3 @@
-# APP--PROJECTS--SY10
+# Project: 01 
+# Library Management System
+-> This project is a simple Library Management System developed in Python using Object-Oriented Programming (OOP) principles. It is designed to manage books and library patrons efficiently. The system allows users to add new books, register patrons, borrow and return books, display available books and registered patrons, search for books by title or author, and remove books from the library. The project demonstrates important OOP concepts such as classes, objects, methods, encapsulation, and object interaction. It also provides a simple menu-driven interface that makes the system easy to use.
