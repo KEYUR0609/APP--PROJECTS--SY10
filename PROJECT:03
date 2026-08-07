@@ -1,0 +1,80 @@
+from abc import ABC, abstractmethod
+
+
+# Strategy Interface
+class PaymentStrategy(ABC):
+
+    @abstractmethod
+    def pay(self, amount):
+        pass
+
+
+# Concrete Strategy 1
+class CreditCardPayment(PaymentStrategy):
+
+    def pay(self, amount):
+        print(f"Paid ₹{amount} using Credit Card.")
+
+
+# Concrete Strategy 2
+class PayPalPayment(PaymentStrategy):
+
+    def pay(self, amount):
+        print(f"Paid ₹{amount} using PayPal.")
+
+
+# Concrete Strategy 3
+class UPIpayment(PaymentStrategy):
+
+    def pay(self, amount):
+        print(f"Paid ₹{amount} using UPI.")
+
+
+# Context
+class PaymentProcessor:
+
+    def __init__(self, strategy=None):
+        self.strategy = strategy
+
+    def set_strategy(self, strategy):
+        self.strategy = strategy
+
+    def process_payment(self, amount):
+        if self.strategy is None:
+            print("Please select a payment method.")
+        else:
+            self.strategy.pay(amount)
+
+
+# Main Program
+processor = PaymentProcessor()
+
+while True:
+    print("\n===== PAYMENT PROCESSING SYSTEM =====")
+    print("1. Credit Card")
+    print("2. PayPal")
+    print("3. UPI")
+    print("4. Exit")
+
+    choice = input("Choose payment method: ")
+
+    if choice == "4":
+        print("Thank you for using the Payment System!")
+        break
+
+    if choice in ["1", "2", "3"]:
+        amount = float(input("Enter payment amount: ₹"))
+
+        if choice == "1":
+            processor.set_strategy(CreditCardPayment())
+
+        elif choice == "2":
+            processor.set_strategy(PayPalPayment())
+
+        elif choice == "3":
+            processor.set_strategy(UPIpayment())
+
+        processor.process_payment(amount)
+
+    else:
+        print("Invalid choice. Please try again.")
